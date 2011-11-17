@@ -1,0 +1,57 @@
+<html>
+<head>
+	<title>Social Timeline</title>
+	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+	<link rel="stylesheet" href="style.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+	<script src="bootstrap-modal.js"></script>
+	<script src="bootstrap-dropdown.js"></script>
+	<script src="http://scripts.embed.ly/jquery.embedly.min.js"></script>
+	<script src="config.js"></script>
+	<script src="script.js"></script>
+</head>
+<body>
+
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="#">Social Timeline</a>
+          <ul class="nav">
+            <li><a href="#" data-controls-modal="about-modal">About</a></li>
+          </ul>
+          <ul class="secondary-nav">
+          </ul>
+        </div>
+      </div>
+    </div>
+
+<div class="container timeline">
+	<div class="row">
+		<div class="span16">
+			<h1>Social Timeline <small>visualize your social data</small></h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="span16" id="timeline">
+		</div>
+	</div>
+	<div class="row">
+		<div class="span16 loadmore">
+			<button id="loadmore" class="btn primary">Load more</button>
+		</div>
+	</div>
+</div>
+
+<!-- About Modal -->
+<div id="about-modal" class="modal hide fade">
+    <div class="modal-header">
+    	<a href="#" class="close">&times;</a>
+    	<h3>About</h3>
+    </div>
+    <div class="modal-body">
+    	<p>Social Timeline was created by <a href="http://sutherlandboswell.com">Sutherland Boswell</a> as a beautiful way to present data collected using <a href="http://thinkupapp.com">ThinkUp</a>, an open source web application that captures your social activity.</p>
+    </div>
+</div>
+
+</body>
+</html>
