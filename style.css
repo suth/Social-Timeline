@@ -39,7 +39,7 @@ div.post.even div.attachments {
 	margin-left: -490px;
 }
 
-div.embed object, div.embed img {
+div.embed object, div.embed iframe, div.embed img {
 	display: block;
 	padding: 10px;
 	margin: 0 auto;
