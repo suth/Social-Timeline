@@ -28,6 +28,14 @@ function filter_text(input) {
 	return input;
 };
 
+// Expand URLs
+function expand_urls(status, links) {
+	for (var i = 0; i < links.length; i++) {
+		status = status.replace(links[i].url, links[i].expanded_url);
+	}
+	return status;
+}
+
 // Attachments
 function construct_attachments(status, links) {
 	var attachments = document.createElement('div');
@@ -46,7 +54,9 @@ function construct_attachments(status, links) {
 function construct_status(item) {
 	var status = document.createElement('div');
 	status.className = 'post ' + post_class;
-	$(status).append("<div class='original-post'><img src='"+item.user.profile_image_url+"' title='@"+item.user.screen_name+"' class='avatar' width='48' height='48'><p>"+filter_text(item.text)+"</p><span class='clearfix'></span></div>");
+	status_text = expand_urls(item.text, item.links)
+	status_text = filter_text(status_text);
+	$(status).append("<div class='original-post'><img src='"+item.user.profile_image_url+"' title='@"+item.user.screen_name+"' class='avatar' width='48' height='48'><p>"+status_text+"</p><span class='clearfix'></span></div>");
 	if (item.links[0]) construct_attachments(status, item.links);
 	if (item.replies) {
 	    var replies = document.createElement('div');
