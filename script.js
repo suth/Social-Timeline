@@ -1,12 +1,11 @@
 // Initial global variables
 var page = 0;
 var post_class = 'even';
+var sourceScript;
 
 // Document ready
 $(document).ready(function() {
 
-  // Load first page
-  load_next_page();
 
   // Add function to button
   $('#loadmore').click(function() {
@@ -17,6 +16,8 @@ $(document).ready(function() {
   $('#about-modal').modal({
   	backdrop: 'true'
   });
+  
+  load_next_page();
 
 });
 
@@ -28,51 +29,22 @@ function filter_text(input) {
 	return input;
 };
 
-// Expand URLs
-function expand_urls(status, links) {
-	for (var i = 0; i < links.length; i++) {
-		status = status.replace(links[i].url, links[i].expanded_url);
-	}
-	return status;
-}
 
 // Attachments
-function construct_attachments(status, links) {
+function construct_attachments(status, item) {
+    var links = item.links;
 	var attachments = document.createElement('div');
 	attachments.className = 'attachments';
 	for (var i = 0; i < links.length; i++) {
-		url = links[i].expanded_url;
+		url = links[i].expanded_url || links[i].url;
+		if(!url) return;
 		domain = url.split(/\/+/g)[1];
 		if ( (domain=='www.youtube.com') || (domain=='twitter.com') || (domain=='www.vimeo.com') || (domain=='twitpic.com') ) {
-			$(attachments).append('<a href="'+item.links[0].expanded_url+'" class="oembed">Attachment</a>');
+			$(attachments).append('<a href="'+item.links[i].expanded_url+'" class="oembed">Attachment</a>');
 		}
 	}
 	if (attachments.innerHTML!='') $(status).append(attachments);
 }
-
-// Construct status block
-function construct_status(item) {
-	var status = document.createElement('div');
-	status.className = 'post ' + post_class;
-	status_text = expand_urls(item.text, item.links)
-	status_text = filter_text(status_text);
-	$(status).append("<div class='original-post'><img src='"+item.user.profile_image_url+"' title='@"+item.user.screen_name+"' class='avatar' width='48' height='48'><p>"+status_text+"</p><span class='clearfix'></span></div>");
-	if (item.links[0]) construct_attachments(status, item.links);
-	if (item.replies) {
-	    var replies = document.createElement('div');
-	    replies.className = 'replies';
-	    $.each(item.replies, function(i,item){
-	    	if (item.user) {
-	    	$(replies).append("<div class='reply'><img src='"+item.user.profile_image_url+"' title='@"+item.user.screen_name+"' class='avatar' width='48' height='48'><p>"+filter_text(item.text)+"</p><span class='clearfix'></span></div>");
-	    	} else {
-	    	$(replies).append("<div class='reply'><img src='' class='avatar' width='48' height='48'><p>"+filter_text(item.text)+"</p><span class='clearfix'></span></div>");
-	    	}
-	    });
-	    $(status).append(replies);
-	};
-	$("#timeline").append(status);
-	$(".oembed").embedly({key:embedly_key,width:920,maxWidth:920});
-};
 
 // Date handling
 var prev_date = new Date('0');
@@ -106,9 +78,65 @@ function get_nth_suffix(date) {
     }
 }
 
+function constructDate(created_at) {
+    date = new Date(created_at);
+    if ( date.getFullYear() != prev_date.getFullYear() ) {
+        $("#timeline").append('<h2 id="'+date.getFullYear()+'" class="timestamp">'+date.getFullYear()+'</h2>');
+        $('.secondary-nav').append('<li class="dropdown" data-dropdown="dropdown" id="'+date.getFullYear()+'-dropdown"><a href="#" class="dropdown-toggle">'+date.getFullYear()+'</a><ul class="dropdown-menu"></ul></li>');
+    }
+    if ( date.getFullYear()+date.getMonth() != prev_date.getFullYear()+prev_date.getMonth() ) {
+        $("#timeline").append('<h3 id="'+date.getFullYear()+'-'+month[date.getMonth()]+'" class="timestamp">'+month[date.getMonth()]+'</h3>');
+        $("#"+date.getFullYear()+"-dropdown > .dropdown-menu").append('<li><a href="#'+date.getFullYear()+'-'+month[date.getMonth()]+'">'+month[date.getMonth()]+'</a></li>');
+    }
+    if ( date.getFullYear()+date.getMonth()+date.getDate() != prev_date.getFullYear()+prev_date.getMonth()+prev_date.getDate() ) {
+        $("#timeline").append('<h4 id="'+date.getDate()+'" class="timestamp">'+date.getDate()+'<sup>'+get_nth_suffix(date.getDate())+'</sup></h4>');
+    }
+    return date;
+}
+
+// Expand URLs
+function expand_urls(status, links) {
+	for (var i = 0; i < links.length; i++) {
+		status = status.replace(links[i].url, links[i].expanded_url);
+	}
+	return status;
+}
+
+// Construct status block
+function construct_status(item) {
+    prev_date = constructDate(item.created_at);
+	var status = document.createElement('div');
+	status.className = 'post ' + post_class;
+	status_text = expand_urls(item.text, item.links)
+	status_text = filter_text(status_text);
+	$(status).append("<div class='original-post'><img src='"+item.user.profile_image_url+"' title='@"+item.user.screen_name+"' class='avatar' width='48' height='48'><p>"+status_text+"</p><span class='clearfix'></span></div>");
+	if (item.links[0]) construct_attachments(status, item);
+	if (item.replies) {
+	    var replies = document.createElement('div');
+	    replies.className = 'replies';
+	    $.each(item.replies, function(i,item){
+	    	if (item.user) {
+	    	$(replies).append("<div class='reply'><img src='"+item.user.profile_image_url+"' title='@"+item.user.screen_name+"' class='avatar' width='48' height='48'><p>"+filter_text(item.text)+"</p><span class='clearfix'></span></div>");
+	    	} else {
+	    	$(replies).append("<div class='reply'><img src='' class='avatar' width='48' height='48'><p>"+filter_text(item.text)+"</p><span class='clearfix'></span></div>");
+	    	}
+	    });
+	    $(status).append(replies);
+	};
+	$("#timeline").append(status);
+	$(".oembed").embedly({key:embedly_key,width:920,maxWidth:920});
+};
+
+// Load next page
+function load_next_page() {
+	page++;
+	load_statuses();
+	return false;
+}
+
 // Request statuses
 var intervalId = 0;;
-function load_statuses(installation_url,username,page) {
+function load_statuses() {
 	var loadButton = document.getElementById('loadmore');
 	loadButton.disabled = true;
 	loadButton.innerHTML = 'Loading...';
@@ -119,34 +147,10 @@ function load_statuses(installation_url,username,page) {
 			loadButton.innerHTML += '.';
 		}
 	}, 300);
-	$.getJSON(installation_url+"api/v1/post.php",
-		{
-			type: "user_posts",
-			count: 20,
-			include_replies: 1,
-			username: username,
-			page: page
-		},
-		function(data) {
+	loadPage(function(data) {
 		  for (var i = 0; i < data.length; i++) {
-			item = data[i];
-			
-date = new Date(item.created_at);
-if ( date.getFullYear() != prev_date.getFullYear() ) {
-	$("#timeline").append('<h2 id="'+date.getFullYear()+'" class="timestamp">'+date.getFullYear()+'</h2>');
-	$('.secondary-nav').append('<li class="dropdown" data-dropdown="dropdown" id="'+date.getFullYear()+'-dropdown"><a href="#" class="dropdown-toggle">'+date.getFullYear()+'</a><ul class="dropdown-menu"></ul></li>');
-}
-if ( date.getFullYear()+date.getMonth() != prev_date.getFullYear()+prev_date.getMonth() ) {
-	$("#timeline").append('<h3 id="'+date.getFullYear()+'-'+month[date.getMonth()]+'" class="timestamp">'+month[date.getMonth()]+'</h3>');
-	$("#"+date.getFullYear()+"-dropdown > .dropdown-menu").append('<li><a href="#'+date.getFullYear()+'-'+month[date.getMonth()]+'">'+month[date.getMonth()]+'</a></li>');
-}
-if ( date.getFullYear()+date.getMonth()+date.getDate() != prev_date.getFullYear()+prev_date.getMonth()+prev_date.getDate() ) {
-	$("#timeline").append('<h4 id="'+date.getDate()+'" class="timestamp">'+date.getDate()+'<sup>'+get_nth_suffix(date.getDate())+'</sup></h4>');
-}
-prev_date = date;
-			
 			if (post_class == 'even') { post_class = 'odd'; } else { post_class = 'even'; };
-			construct_status(item);
+			construct_status(data[i]);
 		  };
 		  $("a.oembed").embedly({key:embedly_key, width:920, maxWidth:920});
 		  clearInterval(intervalId);
@@ -156,22 +160,3 @@ prev_date = date;
 		}
 	);
 };
-
-// Request single status
-function load_status(status_id) {
-	$.getJSON(installation_url+"api/v1/post.php",
-		{
-			post_id: status_id
-		},
-		function(data) {
-			return data;
-		}
-	);
-};
-
-// Load next page
-function load_next_page() {
-	page++;
-	load_statuses(installation_url,username,page);
-	return false;
-}
