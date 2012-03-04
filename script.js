@@ -5,18 +5,18 @@ var post_class = 'even';
 // Document ready
 $(document).ready(function() {
 
-  // Load first page
-  load_next_page();
+	// Load first page
+	load_next_page();
 
-  // Add function to button
-  $('#loadmore').click(function() {
-    load_next_page();
-  });
-  
-  // About modal
-  $('#about-modal').modal({
-  	backdrop: 'true'
-  });
+	// Add function to button
+	$('#loadmore').click(function() {
+		load_next_page();
+	});
+
+	// About modal
+	$('#about-modal').modal({
+		backdrop: 'true'
+	});
 
 });
 
@@ -38,13 +38,16 @@ function expand_urls(status, links) {
 
 // Attachments
 function construct_attachments(status, links) {
-	var attachments = document.createElement('div');
-	attachments.className = 'attachments';
+	var attachments = $('<div/>', { class: 'attachments' });
 	for (var i = 0; i < links.length; i++) {
 		url = links[i].expanded_url;
 		domain = url.split(/\/+/g)[1];
-		if ( (domain=='www.youtube.com') || (domain=='twitter.com') || (domain=='www.vimeo.com') || (domain=='twitpic.com') ) {
-			$(attachments).append('<a href="'+item.links[0].expanded_url+'" class="oembed">Attachment</a>');
+		if ( $.inArray( domain, allowed_attachment_domains ) != -1 ) {
+			attachments.append($('<a/>', {
+				class: 'oembed',
+				href: item.links[0].expanded_url,
+				text: 'Attachment'
+			}));
 		}
 	}
 	if (attachments.innerHTML!='') $(status).append(attachments);
@@ -71,7 +74,6 @@ function construct_status(item) {
 	    $(status).append(replies);
 	};
 	$("#timeline").append(status);
-	$(".oembed").embedly({key:embedly_key,width:920,maxWidth:920});
 };
 
 // Date handling
@@ -122,7 +124,7 @@ function load_statuses(installation_url,username,page) {
 	$.getJSON(installation_url+"api/v1/post.php",
 		{
 			type: "user_posts",
-			count: 20,
+			count: posts_per_page,
 			include_replies: 1,
 			username: username,
 			page: page
