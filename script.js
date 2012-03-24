@@ -38,37 +38,33 @@ function expand_urls(status, links) {
 
 // Attachments
 function construct_attachments(status, links) {
-	var attachments = $('<div/>', { class: 'attachments' });
+	var attachments = $('<div class="attachments"></div>');
 	for (var i = 0; i < links.length; i++) {
 		url = links[i].expanded_url;
 		domain = url.split(/\/+/g)[1];
 		if ( $.inArray( domain, allowed_attachment_domains ) != -1 ) {
-			attachments.append($('<a/>', {
-				class: 'oembed',
-				href: item.links[0].expanded_url,
-				text: 'Attachment'
-			}));
+			attachments.append($('<a href="'+url+'" class="oembed">Attachment</a>'));
 		}
 	}
 	if (attachments.innerHTML!='') $(status).append(attachments);
 }
 
 // Construct status block
-function construct_status(item) {
+function construct_status(currentItem) {
 	var status = document.createElement('div');
 	status.className = 'post ' + post_class;
-	status_text = expand_urls(item.text, item.links)
+	status_text = expand_urls(currentItem.text, currentItem.links)
 	status_text = filter_text(status_text);
-	$(status).append("<div class='original-post'><img src='"+item.user.profile_image_url+"' title='@"+item.user.screen_name+"' class='avatar' width='48' height='48'><p>"+status_text+"</p><span class='clearfix'></span></div>");
-	if (item.links[0]) construct_attachments(status, item.links);
-	if (item.replies) {
+	$(status).append("<div class='original-post'><img src='"+currentItem.user.profile_image_url+"' title='@"+currentItem.user.screen_name+"' class='avatar' width='48' height='48'><p>"+status_text+"</p><span class='clearfix'></span></div>");
+	if (currentItem.links[0]) construct_attachments(status, currentItem.links);
+	if (currentItem.replies) {
 	    var replies = document.createElement('div');
 	    replies.className = 'replies';
-	    $.each(item.replies, function(i,item){
-	    	if (item.user) {
-	    	$(replies).append("<div class='reply'><img src='"+item.user.profile_image_url+"' title='@"+item.user.screen_name+"' class='avatar' width='48' height='48'><p>"+filter_text(item.text)+"</p><span class='clearfix'></span></div>");
+	    $.each(currentItem.replies, function(i,currentItem){
+	    	if (currentItem.user) {
+	    	$(replies).append("<div class='reply'><img src='"+currentItem.user.profile_image_url+"' title='@"+currentItem.user.screen_name+"' class='avatar' width='48' height='48'><p>"+filter_text(currentItem.text)+"</p><span class='clearfix'></span></div>");
 	    	} else {
-	    	$(replies).append("<div class='reply'><img src='' class='avatar' width='48' height='48'><p>"+filter_text(item.text)+"</p><span class='clearfix'></span></div>");
+	    	$(replies).append("<div class='reply'><img src='' class='avatar' width='48' height='48'><p>"+filter_text(currentItem.text)+"</p><span class='clearfix'></span></div>");
 	    	}
 	    });
 	    $(status).append(replies);
@@ -131,9 +127,9 @@ function load_statuses(installation_url,username,page) {
 		},
 		function(data) {
 		  for (var i = 0; i < data.length; i++) {
-			item = data[i];
+			currentItem = data[i];
 			
-date = new Date(item.created_at);
+date = new Date(currentItem.created_at);
 if ( date.getFullYear() != prev_date.getFullYear() ) {
 	$("#timeline").append('<h2 id="'+date.getFullYear()+'" class="timestamp">'+date.getFullYear()+'</h2>');
 	$('.secondary-nav').append('<li class="dropdown" data-dropdown="dropdown" id="'+date.getFullYear()+'-dropdown"><a href="#" class="dropdown-toggle">'+date.getFullYear()+'</a><ul class="dropdown-menu"></ul></li>');
@@ -148,7 +144,7 @@ if ( date.getFullYear()+date.getMonth()+date.getDate() != prev_date.getFullYear(
 prev_date = date;
 			
 			if (post_class == 'even') { post_class = 'odd'; } else { post_class = 'even'; };
-			construct_status(item);
+			construct_status(currentItem);
 		  };
 		  $("a.oembed").embedly({key:embedly_key, width:920, maxWidth:920});
 		  clearInterval(intervalId);
