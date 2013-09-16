@@ -1,6 +1,7 @@
 body {
 	background: #eaeaea;
 	padding-top: 40px;
+	-webkit-font-smoothing: antialiased;
 }
 
 .clearfix {
@@ -34,13 +35,13 @@ a:hover, a:active {
 
 .timestamp {
 	text-align: center;
+	font-weight: bold;
 }
 
 h2.timestamp .date,
 h3.timestamp .date {
 	display: inline-block;
 	background: #eaeaea;
-	color: #8d6aab;
 	line-height: 42px;
 	border-top: 4px solid #d1d1d1;
 	border-bottom: 4px solid #d1d1d1;
@@ -110,6 +111,7 @@ h4.timestamp .date {
 	margin-top: -8px;
 	border-radius: 8px;
 	background-color:#d1d1d1;
+	box-shadow: 0 0 0 2px #eaeaea;
 }
 
 .alt .original-post::before {
