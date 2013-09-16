@@ -73,7 +73,7 @@ h4.timestamp .date {
 	margin-top: -20px;
 }
 
-.post > .status::after {
+.original-post::after {
 	content: "";
 	position: absolute;
 	top: 50%;
@@ -86,7 +86,7 @@ h4.timestamp .date {
 	width: 0;
 }
 
-.post.alt > .status::after {
+.alt .original-post::after {
 	content: "";
 	position: absolute;
 	top: 50%;
@@ -99,8 +99,8 @@ h4.timestamp .date {
 	width: 0;
 }
 
-.post > .status::before {
-	-webkit-transition: all 0.1s ease-in-out;
+.original-post::before {
+	-webkit-transition: all 0.2s ease-in-out;
 	content: "";
 	width: 16px;
 	height: 16px;
@@ -112,13 +112,14 @@ h4.timestamp .date {
 	background-color:#d1d1d1;
 }
 
-.post.alt > .status::before {
+.alt .original-post::before {
 	left: -23px;
 }
 
-.post:hover > .status::before {
+.post:hover .original-post::before {
 	-moz-transform: scale(1.5);
 	-webkit-transform: scale(1.5);
+	background-color: #8d6aab;
 }
 
 .status .body {
@@ -130,8 +131,58 @@ h4.timestamp .date {
 	float: left;
 }
 
+.status .time {
+	opacity: 0;
+	-webkit-transition: right 0.2s ease-out, left 0.2s ease-out, opacity 0.2s linear;
+	position: absolute;
+	display: block;
+	right: -135px;
+	width: 75px;
+	top: 50%;
+	margin-top: -12px;
+	line-height: 24px;
+	height: 24px;
+	color: #8d6aab;
+	font-weight: bold;
+}
+
+.post:hover .status .time {
+	opacity: 1;
+	right: -105px;
+}
+
+.alt .status .time {
+	right: auto;
+	left: -135px;
+	text-align: right;
+}
+
+.post:hover .alt .status .time {
+	right: auto;
+	left: -105px;
+}
+
 .replies .status {
 	margin-top: 10px;
+}
+
+.attachments {
+	text-align: center;
+}
+
+.attachments .embed {
+	display: inline-block;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	background: #fff;
+	border-radius: 5px;
+	padding: 15px;
+	box-shadow: 0 2px 0 #d1d1d1;
+	box-sizing: border-box;
+}
+
+.attachments img {
+	max-width: 100%;
 }
 
 .loadmore {

@@ -19,7 +19,7 @@
 			<ul class="nav navbar-nav">
 	            <li><a data-toggle="modal" href="#about-modal">About</a></li>
 			</ul>
-			<ul class="nav navbar-nav navbar-right">
+			<ul id="date-nav" class="nav navbar-nav navbar-right">
 			</ul>
 		</div>
 	</div>
@@ -54,24 +54,27 @@
 </div><!-- /.modal -->
 
 <script id="entry-template" type="text/x-handlebars-template">
-<div class="row">
-	<div class="post col-md-6 {{#if even}}col-md-offset-6 alt{{/if}}">
-		<div class="status">
-			<img src="{{user.profile_image_url}}" title="@{{user.screen_name}}" class="avatar" width="48" height="48">
-			<div class="body">{{{filtered_text}}}</div>
-			<span class="clearfix"></span>
-		</div>
-		{{#if replies}}
-		<div class="replies">
-			{{#each replies}}
-			<div class="status">
+<div class="post">
+	<div class="row">
+		<div class="col-md-6 {{#if even}}col-md-offset-6 alt{{/if}}">
+			<div class="original-post status">
 				<img src="{{user.profile_image_url}}" title="@{{user.screen_name}}" class="avatar" width="48" height="48">
 				<div class="body">{{{filtered_text}}}</div>
 				<span class="clearfix"></span>
+				<span class="time">{{friendly_time}}</span>
 			</div>
-			{{/each}}
+			{{#if replies}}
+			<div class="replies">
+				{{#each replies}}
+				<div class="status">
+					<img src="{{user.profile_image_url}}" title="@{{user.screen_name}}" class="avatar" width="48" height="48">
+					<div class="body">{{{filtered_text}}}</div>
+					<span class="clearfix"></span>
+				</div>
+				{{/each}}
+			</div>
+			{{/if}}
 		</div>
-		{{/if}}
 	</div>
 </div>
 </script>

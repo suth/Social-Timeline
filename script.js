@@ -5,9 +5,20 @@ var post_even = false;
 var post_template;
 
 Handlebars.registerHelper('filtered_text', function() {
-  return new Handlebars.SafeString(
-    text_filter( expand_urls( this.text, this.links) )
-  );
+	return new Handlebars.SafeString(
+		text_filter( expand_urls( this.text, this.links) )
+	);
+});
+
+Handlebars.registerHelper('friendly_time', function() {
+	var date = new Date(this.created_at);
+	var hour = date.getHours();
+	var min = ("0" + date.getMinutes()).slice(-2);
+	var ampm = hour < 12 ? "am" : "pm";
+	hour = hour % 12 || 12;  // convert to 12-hour format
+	return new Handlebars.SafeString(
+		hour + ":" + min + "&nbsp;" + ampm
+	);
 });
 
 // Document ready
@@ -54,7 +65,7 @@ function expand_urls(status, links) {
 }
 
 // Attachments
-function construct_attachments(status, links) {
+function construct_attachments(links) {
 	var attachments = $('<div class="attachments"></div>');
 	for (var i = 0; i < links.length; i++) {
 		url = links[i].expanded_url;
@@ -63,16 +74,13 @@ function construct_attachments(status, links) {
 			attachments.append($('<a href="'+url+'" class="oembed">Attachment</a>'));
 		}
 	}
-	if (attachments.innerHTML!='') $(status).append(attachments);
+	if (attachments.innerHTML!='') $("#timeline").append(attachments);
 }
 
 // Construct status block
 function construct_status(currentItem) {
-	var status = document.createElement('div');
-	status.className = 'post row';
-	$(status).append(post_template(currentItem));
-	if (currentItem.links[0]) construct_attachments(status, currentItem.links);
-	$("#timeline").append(status);
+	$("#timeline").append(post_template(currentItem));
+	if (currentItem.links[0]) construct_attachments(currentItem.links);
 };
 
 // Date handling
@@ -136,7 +144,7 @@ function load_statuses(installation_url,username,page) {
 date = new Date(currentItem.created_at);
 if ( date.getFullYear() != prev_date.getFullYear() ) {
 	$("#timeline").append('<h2 id="'+date.getFullYear()+'" class="timestamp"><span class="date">'+date.getFullYear()+'</span></h2>');
-	$('.secondary-nav').append('<li class="dropdown" data-dropdown="dropdown" id="'+date.getFullYear()+'-dropdown"><a href="#" class="dropdown-toggle">'+date.getFullYear()+'</a><ul class="dropdown-menu"></ul></li>');
+	$('#date-nav').append('<li class="dropdown" data-toggle="dropdown" id="'+date.getFullYear()+'-dropdown"><a href="#" class="dropdown-toggle">'+date.getFullYear()+'</a><ul class="dropdown-menu" role="menu"></ul></li>');
 }
 if ( date.getFullYear()+date.getMonth() != prev_date.getFullYear()+prev_date.getMonth() ) {
 	$("#timeline").append('<h3 id="'+date.getFullYear()+'-'+month[date.getMonth()]+'" class="timestamp"><span class="date">'+month[date.getMonth()]+'</span></h3>');
