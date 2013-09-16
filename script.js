@@ -1,9 +1,19 @@
 // Initial global variables
 var page = 0;
-var post_class = 'even';
+var post_even = false;
+
+var post_template;
+
+Handlebars.registerHelper('filtered_text', function() {
+  return new Handlebars.SafeString(
+    text_filter( expand_urls( this.text, this.links) )
+  );
+});
 
 // Document ready
 $(document).ready(function() {
+
+	post_template = Handlebars.compile( $('#entry-template').html() );
 
 	// Load first page
 	load_next_page();
@@ -14,15 +24,22 @@ $(document).ready(function() {
 	});
 
 	// About modal
-	$('#about-modal').modal({
-		backdrop: 'true'
-	});
+	// $('#about-modal').modal({
+	// 	backdrop: 'true'
+	// });
 
 });
 
 // Filter text
-function filter_text(input) {
-	input = input.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,"<a href='$1'>$1</a>");
+function text_filter(input) {
+	input = input.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,function(url){
+		if (url.length>50) {
+			visible_url = url.substr(0,47) + '...';
+		} else {
+			visible_url = url;
+		}
+		return "<a href='"+url+"'>"+visible_url+"</a>";
+	});
 	input = input.replace(/(^|\s)@(\w+)/g, "$1<a href='http://www.twitter.com/$2'>@$2</a>");
 	input = input.replace(/(^|\s)#(\w+)/g, "$1<a href='http://search.twitter.com/search?q=%23$2'>#$2</a>");
 	return input;
@@ -52,23 +69,9 @@ function construct_attachments(status, links) {
 // Construct status block
 function construct_status(currentItem) {
 	var status = document.createElement('div');
-	status.className = 'post ' + post_class;
-	status_text = expand_urls(currentItem.text, currentItem.links)
-	status_text = filter_text(status_text);
-	$(status).append("<div class='original-post'><img src='"+currentItem.user.profile_image_url+"' title='@"+currentItem.user.screen_name+"' class='avatar' width='48' height='48'><p>"+status_text+"</p><span class='clearfix'></span></div>");
+	status.className = 'post row';
+	$(status).append(post_template(currentItem));
 	if (currentItem.links[0]) construct_attachments(status, currentItem.links);
-	if (currentItem.replies) {
-	    var replies = document.createElement('div');
-	    replies.className = 'replies';
-	    $.each(currentItem.replies, function(i,currentItem){
-	    	if (currentItem.user) {
-	    	$(replies).append("<div class='reply'><img src='"+currentItem.user.profile_image_url+"' title='@"+currentItem.user.screen_name+"' class='avatar' width='48' height='48'><p>"+filter_text(currentItem.text)+"</p><span class='clearfix'></span></div>");
-	    	} else {
-	    	$(replies).append("<div class='reply'><img src='' class='avatar' width='48' height='48'><p>"+filter_text(currentItem.text)+"</p><span class='clearfix'></span></div>");
-	    	}
-	    });
-	    $(status).append(replies);
-	};
 	$("#timeline").append(status);
 };
 
@@ -126,25 +129,27 @@ function load_statuses(installation_url,username,page) {
 			page: page
 		},
 		function(data) {
+			console.log(data);
 		  for (var i = 0; i < data.length; i++) {
 			currentItem = data[i];
 			
 date = new Date(currentItem.created_at);
 if ( date.getFullYear() != prev_date.getFullYear() ) {
-	$("#timeline").append('<h2 id="'+date.getFullYear()+'" class="timestamp">'+date.getFullYear()+'</h2>');
+	$("#timeline").append('<h2 id="'+date.getFullYear()+'" class="timestamp"><span class="date">'+date.getFullYear()+'</span></h2>');
 	$('.secondary-nav').append('<li class="dropdown" data-dropdown="dropdown" id="'+date.getFullYear()+'-dropdown"><a href="#" class="dropdown-toggle">'+date.getFullYear()+'</a><ul class="dropdown-menu"></ul></li>');
 }
 if ( date.getFullYear()+date.getMonth() != prev_date.getFullYear()+prev_date.getMonth() ) {
-	$("#timeline").append('<h3 id="'+date.getFullYear()+'-'+month[date.getMonth()]+'" class="timestamp">'+month[date.getMonth()]+'</h3>');
+	$("#timeline").append('<h3 id="'+date.getFullYear()+'-'+month[date.getMonth()]+'" class="timestamp"><span class="date">'+month[date.getMonth()]+'</span></h3>');
 	$("#"+date.getFullYear()+"-dropdown > .dropdown-menu").append('<li><a href="#'+date.getFullYear()+'-'+month[date.getMonth()]+'">'+month[date.getMonth()]+'</a></li>');
 }
 if ( date.getFullYear()+date.getMonth()+date.getDate() != prev_date.getFullYear()+prev_date.getMonth()+prev_date.getDate() ) {
-	$("#timeline").append('<h4 id="'+date.getDate()+'" class="timestamp">'+date.getDate()+'<sup>'+get_nth_suffix(date.getDate())+'</sup></h4>');
+	$("#timeline").append('<h4 id="'+date.getDate()+'" class="timestamp"><span class="date">'+date.getDate()+'<sup>'+get_nth_suffix(date.getDate())+'</sup></span></h4>');
 }
 prev_date = date;
 			
-			if (post_class == 'even') { post_class = 'odd'; } else { post_class = 'even'; };
+			currentItem.even = post_even;
 			construct_status(currentItem);
+			if (post_even == true) { post_even = false; } else { post_even = true; };
 		  };
 		  $("a.oembed").embedly({key:embedly_key, width:920, maxWidth:920});
 		  clearInterval(intervalId);

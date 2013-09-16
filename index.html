@@ -1,57 +1,80 @@
 <html>
 <head>
 	<title>Social Timeline</title>
-	<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
 	<link rel="stylesheet" href="style.css">
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
-	<script src="bootstrap-modal.js"></script>
-	<script src="bootstrap-dropdown.js"></script>
-	<script src="http://scripts.embed.ly/jquery.embedly.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script src="http://cdn.embed.ly/jquery.embedly-3.1.1.min.js"></script>
+	<script src="handlebars.js"></script>
 	<script src="config.js"></script>
 	<script src="script.js"></script>
 </head>
 <body>
 
-    <div class="topbar">
-      <div class="fill">
-        <div class="container">
-          <a class="brand" href="#">Social Timeline</a>
-          <ul class="nav">
-            <li><a href="#" data-controls-modal="about-modal">About</a></li>
-          </ul>
-          <ul class="secondary-nav">
-          </ul>
-        </div>
-      </div>
-    </div>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">Social Timeline</a>
+			<ul class="nav navbar-nav">
+	            <li><a data-toggle="modal" href="#about-modal">About</a></li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+			</ul>
+		</div>
+	</div>
+</nav>
 
 <div class="container timeline">
-	<div class="row">
-		<div class="span16">
-			<h1>Social Timeline <small>visualize your social data</small></h1>
-		</div>
+	<div id="timeline">
 	</div>
 	<div class="row">
-		<div class="span16" id="timeline">
-		</div>
-	</div>
-	<div class="row">
-		<div class="span16 loadmore">
-			<button id="loadmore" class="btn primary">Load more</button>
+		<div class="col16 loadmore">
+			<button id="loadmore" class="btn btn-primary">Load more</button>
 		</div>
 	</div>
 </div>
 
-<!-- About Modal -->
-<div id="about-modal" class="modal hide fade">
-    <div class="modal-header">
-    	<a href="#" class="close">&times;</a>
-    	<h3>About</h3>
-    </div>
-    <div class="modal-body">
-    	<p>Social Timeline was created by <a href="http://sutherlandboswell.com">Sutherland Boswell</a> as a beautiful way to present data collected using <a href="http://thinkupapp.com">ThinkUp</a>, an open source web application that captures your social activity.</p>
-    </div>
+<!-- Modal -->
+<div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">About</h4>
+			</div>
+			<div class="modal-body">
+		    	<p>Social Timeline was created by <a href="http://sutherlandboswell.com">Sutherland Boswell</a> as a beautiful way to present data collected using <a href="http://thinkupapp.com">ThinkUp</a>, an open source web application that captures your social activity.</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script id="entry-template" type="text/x-handlebars-template">
+<div class="row">
+	<div class="post col-md-6 {{#if even}}col-md-offset-6 alt{{/if}}">
+		<div class="status">
+			<img src="{{user.profile_image_url}}" title="@{{user.screen_name}}" class="avatar" width="48" height="48">
+			<div class="body">{{{filtered_text}}}</div>
+			<span class="clearfix"></span>
+		</div>
+		{{#if replies}}
+		<div class="replies">
+			{{#each replies}}
+			<div class="status">
+				<img src="{{user.profile_image_url}}" title="@{{user.screen_name}}" class="avatar" width="48" height="48">
+				<div class="body">{{{filtered_text}}}</div>
+				<span class="clearfix"></span>
+			</div>
+			{{/each}}
+		</div>
+		{{/if}}
+	</div>
 </div>
+</script>
 
 </body>
 </html>
