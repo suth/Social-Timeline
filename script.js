@@ -138,32 +138,39 @@ function load_statuses(installation_url,username,page) {
 		},
 		function(data) {
 			console.log(data);
-		  for (var i = 0; i < data.length; i++) {
-			currentItem = data[i];
-			
-date = new Date(currentItem.created_at);
-if ( date.getFullYear() != prev_date.getFullYear() ) {
-	$("#timeline").append('<h2 id="'+date.getFullYear()+'" class="timestamp"><span class="date">'+date.getFullYear()+'</span></h2>');
-	$('#date-nav').append('<li class="dropdown" data-toggle="dropdown" id="'+date.getFullYear()+'-dropdown"><a href="#" class="dropdown-toggle">'+date.getFullYear()+'</a><ul class="dropdown-menu" role="menu"></ul></li>');
-}
-if ( date.getFullYear()+date.getMonth() != prev_date.getFullYear()+prev_date.getMonth() ) {
-	$("#timeline").append('<h3 id="'+date.getFullYear()+'-'+month[date.getMonth()]+'" class="timestamp"><span class="date">'+month[date.getMonth()]+'</span></h3>');
-	$("#"+date.getFullYear()+"-dropdown > .dropdown-menu").append('<li><a href="#'+date.getFullYear()+'-'+month[date.getMonth()]+'">'+month[date.getMonth()]+'</a></li>');
-}
-if ( date.getFullYear()+date.getMonth()+date.getDate() != prev_date.getFullYear()+prev_date.getMonth()+prev_date.getDate() ) {
-	$("#timeline").append('<h4 id="'+date.getDate()+'" class="timestamp"><span class="date">'+date.getDate()+'<sup>'+get_nth_suffix(date.getDate())+'</sup></span></h4>');
-}
-prev_date = date;
-			
-			currentItem.even = post_even;
-			construct_status(currentItem);
-			if (post_even == true) { post_even = false; } else { post_even = true; };
-		  };
-		  $("a.oembed").embedly({key:embedly_key, width:920, maxWidth:920});
-		  clearInterval(intervalId);
-		  var loadButton = document.getElementById('loadmore');
-		  loadButton.disabled = false;
-		  loadButton.innerHTML = 'Load more';
+			for (var i = 0; i < data.length; i++) {
+				currentItem = data[i];
+				
+				date = new Date(currentItem.created_at);
+				if ( date.getFullYear() != prev_date.getFullYear() ) {
+					$("#timeline").append('<h2 id="'+date.getFullYear()+'" class="timestamp"><span class="date">'+date.getFullYear()+'</span></h2>');
+					$('#date-nav').append('<li class="dropdown" id="'+date.getFullYear()+'-dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">'+date.getFullYear()+'</a><ul class="dropdown-menu" role="menu"></ul></li>');
+				}
+				if ( date.getFullYear()+date.getMonth() != prev_date.getFullYear()+prev_date.getMonth() ) {
+					$("#timeline").append('<h3 id="'+date.getFullYear()+'-'+month[date.getMonth()]+'" class="timestamp"><span class="date">'+month[date.getMonth()]+'</span></h3>');
+					$("#"+date.getFullYear()+"-dropdown > .dropdown-menu").append('<li><a href="#'+date.getFullYear()+'-'+month[date.getMonth()]+'">'+month[date.getMonth()]+'</a></li>');
+				}
+				if ( date.getFullYear()+date.getMonth()+date.getDate() != prev_date.getFullYear()+prev_date.getMonth()+prev_date.getDate() ) {
+					$("#timeline").append('<h4 id="'+date.getDate()+'" class="timestamp"><span class="date">'+date.getDate()+'<sup>'+get_nth_suffix(date.getDate())+'</sup></span></h4>');
+				}
+				prev_date = date;
+				
+				currentItem.even = post_even;
+				construct_status(currentItem);
+				if (post_even == true) { post_even = false; } else { post_even = true; };
+		 	};
+			$("a.oembed").embedly({
+				key:embedly_key,
+				width:1140,
+				maxWidth:1140
+			}).bind('displayed', function(e, data){
+				console.log(e);
+			  $(".embed").fitVids();
+			});
+			clearInterval(intervalId);
+			var loadButton = document.getElementById('loadmore');
+			loadButton.disabled = false;
+			loadButton.innerHTML = 'Load more';
 		}
 	);
 };
