@@ -191,3 +191,50 @@ h4.timestamp .date {
 	text-align: center;
 	margin: 40px 0;
 }
+
+@media (max-width: 767px) {
+
+	.alt .original-post::after,
+	.original-post::after {
+		top: -13px;
+		left: 50%;
+		right: auto;
+		margin: 0 0 0 -13px;
+		border-width: 0 13px 13px 13px;
+		border-style: solid;
+		border-color: transparent transparent white transparent;
+	}
+
+	.alt .original-post::before,
+	.original-post::before {
+		top: -23px;
+		left: 50%;
+		right: auto;
+		margin: 0 0 0 -8px;
+		background-color: #8d6aab;
+	}
+
+	.post:hover .alt .original-post::before,
+	.post:hover .original-post::before {
+		-webkit-transform: none;
+	}
+
+	.post,
+	.post + .post {
+		margin-top: 40px;
+		margin-bottom: 40px;
+	}
+
+	.status .time,
+	.alt .status .time,
+	.post:hover .status .time,
+	.post:hover .alt .status .time {
+		top: -26px;
+		left: 50%;
+		right: auto;
+		margin: 0 0 0 15px;
+		opacity: 1;
+		text-align: left;
+	}
+
+}
