@@ -38,6 +38,12 @@ $(document).ready(function() {
 	// $('#about-modal').modal({
 	// 	backdrop: 'true'
 	// });
+	
+	$('body').on('DOMNodeInserted', '#timeline', function(e) {
+		if ($(e.target).attr('class') === 'embed') {
+			$(e.target).fitVids();
+		}
+	});
 
 });
 
@@ -163,9 +169,6 @@ function load_statuses(installation_url,username,page) {
 				key:embedly_key,
 				width:1140,
 				maxWidth:1140
-			}).bind('displayed', function(e, data){
-				console.log(e);
-			  $(".embed").fitVids();
 			});
 			clearInterval(intervalId);
 			var loadButton = document.getElementById('loadmore');

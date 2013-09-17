@@ -43,6 +43,8 @@ h3.timestamp .date {
 	display: inline-block;
 	background: #eaeaea;
 	line-height: 42px;
+	padding-top: 15px;
+	padding-bottom: 15px;
 	border-top: 4px solid #d1d1d1;
 	border-bottom: 4px solid #d1d1d1;
 }
@@ -173,6 +175,7 @@ h4.timestamp .date {
 }
 
 .attachments .embed {
+	width: 100%;
 	display: inline-block;
 	margin-top: 10px;
 	margin-bottom: 10px;
@@ -235,6 +238,10 @@ h4.timestamp .date {
 		margin: 0 0 0 15px;
 		opacity: 1;
 		text-align: left;
+	}
+
+	.attachments .embed {
+		margin-top: -30px;
 	}
 
 }
